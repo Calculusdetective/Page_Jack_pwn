@@ -1,0 +1,63 @@
+PageJack GDB terminal capture (2026-09-13)
+
+(gdb) bt 8
+#0  watch_queue_set_filter (pipe=0xffff888006d2ee40, _filter=0x95e610)
+    at /work/learning_materials/pagejack/reproduction/kernel-src/linux-6.5-rc1/kernel/watch_queue.c:309
+#1  0xffffffff814857ed in vfs_ioctl (...)
+    at /work/learning_materials/pagejack/reproduction/kernel-src/linux-6.5-rc1/fs/ioctl.c:51
+#2  __do_sys_ioctl (...)
+    at /work/learning_materials/pagejack/reproduction/kernel-src/linux-6.5-rc1/fs/ioctl.c:870
+#3  __se_sys_ioctl (...)
+    at /work/learning_materials/pagejack/reproduction/kernel-src/linux-6.5-rc1/fs/ioctl.c:856
+#4  __x64_sys_ioctl (...)
+    at /work/learning_materials/pagejack/reproduction/kernel-src/linux-6.5-rc1/fs/ioctl.c:856
+#5  do_syscall_x64 (...)
+    at /work/learning_materials/pagejack/reproduction/kernel-src/linux-6.5-rc1/arch/x86/entry/common.c:50
+#6  do_syscall_64 (...)
+    at /work/learning_materials/pagejack/reproduction/kernel-src/linux-6.5-rc1/arch/x86/entry/common.c:80
+#7  entry_SYSCALL_64 ()
+    at /work/learning_materials/pagejack/reproduction/kernel-src/linux-6.5-rc1/arch/x86/entry/entry_64.S:120
+
+(gdb) list 304,314
+304  /*
+305   * Set the filter on a watch queue.
+306   */
+307  long watch_queue_set_filter(struct pipe_inode_info *pipe,
+308                              struct watch_notification_filter __user *_filter)
+309  {
+310          struct watch_notification_type_filter *tf;
+311          struct watch_notification_filter filter;
+312          struct watch_type_filter *q;
+313          struct watch_filter *wfilter;
+314          struct watch_queue *wqueue = pipe->watch_queue;
+
+(gdb) p i
+$10 = 3
+(gdb) p/x tf[i].type
+$11 = 0x306
+(gdb) p/x filter.nr_filters
+$12 = 0x4
+(gdb) p/x q->type
+$13 = 0x0
+(gdb) p/x wfilter
+$14 = 0xffff888007161ba0
+(gdb) p/x (char *)wfilter->type_filter + 0x60
+$15 = 0xffff888007161c00
+
+(gdb) list 367,372
+367          q->type                  = tf[i].type;
+368          q->info_filter           = tf[i].info_filter;
+369          q->info_mask             = tf[i].info_mask;
+370          q->subtype_filter[0]     = tf[i].subtype_filter[0];
+371          __set_bit(q->type, wfilter->type_filter);
+372          q++;
+(gdb) p/x tf[3].type
+$16 = 0x306
+(gdb) p/x (char *)wfilter->type_filter + 0x60
+$17 = 0xffff888007161c00
+(gdb) x/4gx (char *)wfilter->type_filter + 0x50
+0xffff888007161bf0:  0x0000000000000000  0x0000000000000000
+0xffff888007161c00:  0xffffea00001c64c0  0x0000002400000000
+
+The GDB commands and values above were read from the visible Kitty GDB
+window.  The screen capture shows the same commands and output.

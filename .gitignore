@@ -1,0 +1,19 @@
+# Linux source and out-of-tree build products (the source is fetched by the
+# build script; executable VM artifacts are distributed in a GitHub Release).
+/kernel/source/
+/kernel/build/
+/kernel/vmlinux
+/kernel/vmlinux-author.stripped
+/kernel/bzImage-debug
+/kernel/bzImage-author
+/challenge/exp
+/rootfs/*.cpio
+/rootfs/*-unpacked/
+/release-assets/
+
+# Local editor and Python artifacts.
+__pycache__/
+*.py[cod]
+*.swp
+*.swo
+*~

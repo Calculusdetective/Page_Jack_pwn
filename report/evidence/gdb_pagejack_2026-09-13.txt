@@ -1,0 +1,82 @@
+PageJack GDB evidence capture
+Date: 2026-09-13 (Asia/Shanghai)
+Kernel: Page_Jack_pwn/kernel/vmlinux
+Guest: Page_Jack_pwn/run_gdb.sh + rootfs/rootfs-gdb.cpio
+
+The following is a faithful excerpt from the interactive GDB session.
+The addresses are run-specific kernel addresses and are preserved for this run.
+
+$ gdb -q ./kernel/vmlinux -x ./gdb-pagejack.gdb
+Reading symbols from ./kernel/vmlinux...
+Breakpoint 1 at 0xffffffff8139cb30: file /work/learning_materials/pagejack/reproduction/kernel-src/linux-6.5-rc1/kernel/watch_queue.c, line 309.
+Breakpoint 2 at 0xffffffff81477930: file /work/learning_materials/pagejack/reproduction/kernel-src/linux-6.5-rc1/fs/pipe.c, line 785.
+Breakpoint 3 at 0xffffffff81477c30: file /work/learning_materials/pagejack/reproduction/kernel-src/linux-6.5-rc1/fs/pipe.c, line 718.
+PageJack GDB target connected.  Use 'continue' to boot or resume.
+
+(gdb) disable 2 3
+(gdb) break kernel/source/linux-6.5-rc1/kernel/watch_queue.c:367
+Breakpoint 4 at 0xffffffff8139cc83: file /work/learning_materials/pagejack/reproduction/kernel-src/linux-6.5-rc1/kernel/watch_queue.c, line 367.
+(gdb) continue
+
+Breakpoint 1, watch_queue_set_filter (pipe=0xffff888006d2e000,
+    _filter=0x1c2b610)
+    at /work/learning_materials/pagejack/reproduction/kernel-src/linux-6.5-rc1/kernel/watch_queue.c:309
+(gdb) bt
+#0  watch_queue_set_filter (pipe=0xffff888006d2e000, _filter=0x1c2b610)
+    at /work/learning_materials/pagejack/reproduction/kernel-src/linux-6.5-rc1/kernel/watch_queue.c:309
+#1  0xffffffff814857ed in vfs_ioctl (arg=29537808, cmd=<optimized out>,
+    filp=0xffff8880068b6000)
+    at /work/learning_materials/pagejack/reproduction/kernel-src/linux-6.5-rc1/fs/ioctl.c:51
+#2  __do_sys_ioctl (arg=29537808, cmd=<optimized out>, fd=<optimized out>)
+    at /work/learning_materials/pagejack/reproduction/kernel-src/linux-6.5-rc1/fs/ioctl.c:870
+#3  __se_sys_ioctl (arg=29537808, cmd=<optimized out>, fd=<optimized out>)
+    at /work/learning_materials/pagejack/reproduction/kernel-src/linux-6.5-rc1/fs/ioctl.c:856
+#4  __x64_sys_ioctl (regs=<optimized out>)
+    at /work/learning_materials/pagejack/reproduction/kernel-src/linux-6.5-rc1/fs/ioctl.c:856
+#5  0xffffffff8230dd24 in do_syscall_x64 (nr=<optimized out>,
+    regs=0xffffc900002d7f58)
+    at /work/learning_materials/pagejack/reproduction/kernel-src/linux-6.5-rc1/arch/x86/entry/common.c:50
+(gdb) continue
+
+Breakpoint 4, watch_queue_set_filter (pipe=0xffff888006d2e000,
+    _filter=<optimized out>)
+    at /work/learning_materials/pagejack/reproduction/kernel-src/linux-6.5-rc1/kernel/watch_queue.c:367
+367             q->type = tf[i].type;
+
+(gdb) continue
+(gdb) continue
+(gdb) continue
+(gdb) p i
+$12 = 3
+(gdb) p/x tf[i].type
+$13 = 0x306
+(gdb) p/x filter.nr_filters
+$14 = 0x4
+(gdb) p/x wfilter
+$16 = 0xffff888007160c60
+(gdb) p/x (char *)wfilter->type_filter + 0x60
+$17 = 0xffff888007160cc0
+(gdb) p/x sizeof(unsigned long)
+$9 = 0x8
+(gdb) p/x sizeof(struct watch_filter)
+$10 = 0x18
+(gdb) p/x sizeof(struct watch_type_filter)
+$11 = 0x10
+
+(gdb) p/x q->type
+$18 = 0x306
+(gdb) p/x wfilter->type_filter[0]
+$19 = 0x2
+(gdb) x/4gx (char *)wfilter->type_filter + 0x50
+0xffff888007160cb0:  0x0000000000000000  0x0000000000000000
+0xffff888007160cc0:  0xffffea00001c6500  0x0000002400000000
+(gdb) si
+Breakpoint 5, watch_queue_set_filter (...) at .../kernel/watch_queue.c:372
+(gdb) x/4gx (char *)wfilter->type_filter + 0x50
+0xffff888007160cb0:  0x0000000000000000  0x0000000000000000
+0xffff888007160cc0:  0xffffea00001c6540  0x0000002400000000
+
+Interpretation:
+0x306 / 64 = 0xc, 0x306 % 64 = 0x6, so the bitmap write is at
+type_filter + 0xc * 8 = type_filter + 0x60 with mask 0x40.
+In this run the value at that location changed from ...6500 to ...6540.

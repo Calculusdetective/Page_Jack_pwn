@@ -1,0 +1,14 @@
+Screen capture notes (2026-09-13)
+
+The four report images named gdb_terminal_01_callstack_2026-09-13.png,
+gdb_terminal_02_filter_type_2026-09-13.png,
+gdb_terminal_03_setbit_memory_dark_2026-09-13.png, and
+qemu_terminal_04_success_dark_2026-09-13.png were captured with grim from
+the Wayland desktop while the Kitty windows PageJack GDB and PageJack QEMU
+were focused in turn.
+
+The GDB window was connected to the QEMU guest started by run_gdb.sh.  The
+QEMU window was the guest's -nographic serial console.  These are screen
+captures of live terminal windows.  The three older text-rendered PNGs were
+moved to figures/archive_rendered/ and are not referenced by the revised
+report.

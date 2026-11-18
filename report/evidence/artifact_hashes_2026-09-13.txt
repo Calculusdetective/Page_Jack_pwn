@@ -1,0 +1,12 @@
+PageJack reproduction artifact hashes (SHA-256)
+Date: 2026-09-13
+
+ecc9293229629c649b7b4a1129125f2fdd508421ad98ebac47de704b58b417ef  kernel/vmlinux
+dad40c19e48be139c267095b889606f81360c28656b71e034d35f9a331dd6047  kernel/bzImage-debug
+0dc01b546db8e798d5ce3148e6beace7cc78104bd30a9f8586e95eacdf9844f3  challenge/exp
+da784ec73a36246db326f3949dff0ba31052981131c1e2951073934ab99633b5  rootfs/rootfs-gdb.cpio
+8dfbca6dd320669ca2b847dd78fb6220bc0971d2a12cce68b2987436dd909447  flag.img
+
+Relevant configuration lines:
+CONFIG_PAGEJACK_LAB_VULN=y
+CONFIG_WATCH_QUEUE=y

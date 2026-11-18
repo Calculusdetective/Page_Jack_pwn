@@ -1,0 +1,46 @@
+diff --git a/init/Kconfig b/init/Kconfig
+index 5f56b4c1e7c8..872dc50150cc 100644
+--- a/init/Kconfig
++++ b/init/Kconfig
+@@ -126,6 +126,15 @@ config BROKEN
+ 	bool
+ 
++config PAGEJACK_LAB_VULN
++	bool "PageJack lab vulnerable watch_queue filter"
++	depends on WATCH_QUEUE
++	default n
++	help
++	  Deliberately retain the watch_queue type-filter bounds bug used by the
++	  PageJack teaching lab. This is for an isolated QEMU guest only and must
++	  never be enabled in a production kernel.
++
+ config BROKEN_ON_SMP
+ 	bool
+ 	depends on BROKEN || !SMP
+diff --git a/kernel/watch_queue.c b/kernel/watch_queue.c
+index 3ed1d9b4bb51..7139ab7331bd 100644
+--- a/kernel/watch_queue.c
++++ b/kernel/watch_queue.c
+@@ -341,8 +341,10 @@ static long watch_queue_set_filter(struct pipe_inode_info *pipe,
+ 		    tf[i].info_mask & WATCH_INFO_LENGTH)
+ 			goto err_filter;
+ 		/* Ignore any unknown types */
++#ifndef CONFIG_PAGEJACK_LAB_VULN
+ 		if (tf[i].type >= WATCH_TYPE__NR)
+ 			continue;
++#endif
+ 		nr_filter++;
+ 	}
+ 
+@@ -357,8 +359,10 @@ static long watch_queue_set_filter(struct pipe_inode_info *pipe,
+ 
+ 	q = wfilter->filters;
+ 	for (i = 0; i < filter.nr_filters; i++) {
++#ifndef CONFIG_PAGEJACK_LAB_VULN
+ 		if (tf[i].type >= WATCH_TYPE__NR)
+ 			continue;
++#endif
+ 
+ 		q->type			= tf[i].type;
+ 		q->info_filter		= tf[i].info_filter;
+ 		q->info_mask		= tf[i].info_mask;
